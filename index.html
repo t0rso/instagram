@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Instagram Followers vs Following — Static Dashboard</title>
+  <style>
+    :root{
+      --bg:#0b0d12;
+      --panel:#121625;
+      --text:#e9ecf5;
+      --muted:#a8b0c6;
+      --border:rgba(255,255,255,.10);
+      --accent:#7aa2ff;
+      --good:#3ddc97;
+      --warn:#ffcc66;
+      --bad:#ff6b6b;
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 600px at 10% 0%, rgba(122,162,255,.18), transparent 55%),
+                  radial-gradient(900px 500px at 90% 10%, rgba(61,220,151,.14), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    code{font-family:var(--mono)}
+    .wrap{max-width:1100px; margin:40px auto; padding:0 18px}
+    header{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .title h1{margin:0; font-size:22px; letter-spacing:.2px}
+    .title p{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.35}
+    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    .btn{
+      appearance:none; border:1px solid var(--border); background:rgba(255,255,255,.04);
+      color:var(--text); padding:9px 12px; border-radius:12px; cursor:pointer;
+      display:inline-flex; gap:8px; align-items:center; font-size:13px;
+      transition:transform .06s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover{background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.18)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{border-color:rgba(122,162,255,.45); background:rgba(122,162,255,.12)}
+    .btn.primary:hover{background:rgba(122,162,255,.16)}
+    .btn:disabled{opacity:.5; cursor:not-allowed}
+
+    .pill{
+      border:1px solid var(--border); background:rgba(255,255,255,.03);
+      padding:8px 10px; border-radius:999px; font-size:12px; color:var(--muted);
+      display:flex; gap:8px; align-items:center;
+    }
+    .dot{width:8px; height:8px; border-radius:50%; background:var(--warn)}
+    .dot.ok{background:var(--good)}
+    .dot.bad{background:var(--bad)}
+
+    .grid{
+      display:grid; gap:14px;
+      grid-template-columns: repeat(12, 1fr);
+      margin-top:14px;
+    }
+    .panel{
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+    .row2{
+      display:grid; gap:12px;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items:end;
+    }
+    .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    .field input[type="text"]{
+      width:100%;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      outline:none;
+    }
+    .field input[type="text"]:focus{
+      border-color:rgba(122,162,255,.55);
+      box-shadow:0 0 0 3px rgba(122,162,255,.18)
+    }
+    .field input[type="file"]{
+      width:100%;
+      border:1px dashed rgba(255,255,255,.18);
+      background:rgba(0,0,0,.18);
+      color:var(--muted);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+    }
+
+    .cards{display:grid; gap:14px; grid-template-columns: repeat(12, 1fr); margin-top:14px;}
+    .card{
+      grid-column: span 3;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+      min-height:92px;
+    }
+    .card h3{margin:0; font-size:13px; color:var(--muted); font-weight:600}
+    .card .num{margin-top:10px; font-size:28px; font-weight:750; letter-spacing:.2px}
+    .card small{display:block; margin-top:6px; color:var(--muted); font-size:12px}
+    .card.good .num{color:var(--good)}
+    .card.bad .num{color:var(--bad)}
+    .card.warn .num{color:var(--warn)}
+
+    .panelTop{
+      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .tabs{display:flex; gap:8px; flex-wrap:wrap;}
+    .tab{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      padding:8px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:13px;
+      transition:background .15s ease, color .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .tab.active{
+      color:var(--text);
+      border-color:rgba(122,162,255,.5);
+      background:rgba(122,162,255,.13);
+    }
+    .tools{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .search{
+      min-width:220px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:12px;
+      font-size:13px;
+      outline:none;
+    }
+    .search:focus{border-color:rgba(122,162,255,.55); box-shadow:0 0 0 3px rgba(122,162,255,.18)}
+    .listMeta{margin-top:8px; display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:12px;}
+    .badge{
+      font-family: var(--sans);
+      font-size:12px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      background:rgba(255,255,255,.03);
+    }
+    .list{
+      margin-top:12px;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      overflow:hidden;
+      background:rgba(0,0,0,.18);
+    }
+    .row{
+      display:flex; gap:12px; align-items:center;
+      padding:10px 12px;
+      border-top:1px solid rgba(255,255,255,.06);
+      font-family: var(--mono);
+      font-size:13px;
+    }
+    .row:first-child{border-top:none}
+    .idx{width:44px; color:rgba(255,255,255,.38); text-align:right; font-variant-numeric: tabular-nums;}
+    .user{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+    .barWrap{margin-top:14px; display:grid; grid-template-columns: 1fr 1fr; gap:14px;}
+    .mini{border:1px solid var(--border); background:rgba(255,255,255,.03); border-radius:14px; padding:12px;}
+    .mini h4{margin:0 0 8px; font-size:13px; color:var(--muted)}
+    .bar{height:10px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(255,255,255,.08);}
+    .bar > div{height:100%; width:0%; background: linear-gradient(90deg, rgba(122,162,255,.9), rgba(61,220,151,.9)); transition:width .4s ease;}
+    .mini .kv{margin-top:8px; display:flex; justify-content:space-between; gap:10px; font-family:var(--mono); font-size:12px; color:var(--muted);}
+
+    .notice{
+      margin-top:14px;
+      padding:12px;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:14px;
+      color:var(--muted);
+      background:rgba(255,255,255,.03);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .hidden{display:none !important}
+    @media (max-width: 860px){
+      .card{grid-column: span 6}
+      .row2{grid-template-columns: 1fr}
+      .barWrap{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Instagram Followers vs Following — Static Dashboard</h1>
+        <p>
+          Seleziona i due file JSON dell’export Instagram e visualizza il confronto.
+          Tutto avviene <b>localmente</b> (no upload).<br/>
+          Parsing supportato: Followers <code>LIST</code> (value→title) + Following <code>object.relationships_following</code> (title→value).
+        </p>
+      </div>
+      <div class="actions">
+        <div class="pill"><span id="statusDot" class="dot"></span><span id="statusText">Seleziona i file…</span></div>
+        <button class="btn primary" id="btnCompute" type="button" disabled>Calcola</button>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="row2">
+        <div class="field">
+          <label>Followers JSON (root: LIST)</label>
+          <input id="fileFollowers" type="file" accept=".json,application/json" />
+        </div>
+        <div class="field">
+          <label>Following JSON (root: OBJECT → relationships_following)</label>
+          <input id="fileFollowing" type="file" accept=".json,application/json" />
+        </div>
+        <div class="field">
+          <label>Nome progetto (opzionale)</label>
+          <input id="projectName" type="text" placeholder="es. IG_Audit_Jan2026" />
+        </div>
+      </div>
+
+      <div class="notice" id="diagBox">
+        Suggerimento: se Instagram ti ha esportato file con nomi simili, controlla il contenuto:
+        Followers = lista; Following = oggetto con <code>relationships_following</code>.
+      </div>
+    </section>
+
+    <section class="cards hidden" id="cards">
+      <div class="card">
+        <h3>Followers</h3>
+        <div class="num" id="followersCount">—</div>
+        <small>Totale followers</small>
+      </div>
+      <div class="card">
+        <h3>Following</h3>
+        <div class="num" id="followingCount">—</div>
+        <small>Totale following</small>
+      </div>
+      <div class="card bad">
+        <h3>Not following back</h3>
+        <div class="num" id="nfbCount">—</div>
+        <small>following \ followers</small>
+      </div>
+      <div class="card warn">
+        <h3>I don't follow back</h3>
+        <div class="num" id="idfbCount">—</div>
+        <small>followers \ following</small>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="resultsPanel" style="margin-top:14px;">
+      <div class="panelTop">
+        <div class="tabs">
+          <div class="tab active" data-tab="nfb">NOT FOLLOWING BACK</div>
+          <div class="tab" data-tab="idfb">I DON'T FOLLOW BACK</div>
+        </div>
+
+        <div class="tools">
+          <input class="search" id="search" placeholder="Search username…" autocomplete="off" />
+          <button class="btn" id="btnCopy" type="button">Copy list</button>
+          <button class="btn" id="btnDownloadCSV" type="button">Download CSV</button>
+          <button class="btn" id="btnDownloadExport" type="button">Download export.json</button>
+          <button class="btn" id="btnDownloadReport" type="button">Download report.txt</button>
+        </div>
+      </div>
+
+      <div class="listMeta">
+        <span class="badge" id="activeListLabel">—</span>
+        <span id="shownMeta">—</span>
+        <span class="badge" id="parsingMeta">—</span>
+      </div>
+
+      <div class="list" id="list"></div>
+
+      <div class="barWrap">
+        <div class="mini">
+          <h4>Follow-back ratio (Followers / Following)</h4>
+          <div class="bar"><div id="ratioBar"></div></div>
+          <div class="kv"><span id="ratioLeft">—</span><span id="ratioRight">—</span></div>
+        </div>
+        <div class="mini">
+          <h4>Unreciprocated split</h4>
+          <div class="bar"><div id="splitBar"></div></div>
+          <div class="kv"><span id="splitLeft">—</span><span id="splitRight">—</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ----------------------------
+  // DOM
+  // ----------------------------
+  const el = {
+    statusDot: document.getElementById("statusDot"),
+    statusText: document.getElementById("statusText"),
+    diagBox: document.getElementById("diagBox"),
+
+    fileFollowers: document.getElementById("fileFollowers"),
+    fileFollowing: document.getElementById("fileFollowing"),
+    projectName: document.getElementById("projectName"),
+    btnCompute: document.getElementById("btnCompute"),
+
+    cards: document.getElementById("cards"),
+    followersCount: document.getElementById("followersCount"),
+    followingCount: document.getElementById("followingCount"),
+    nfbCount: document.getElementById("nfbCount"),
+    idfbCount: document.getElementById("idfbCount"),
+
+    resultsPanel: document.getElementById("resultsPanel"),
+    tabs: [...document.querySelectorAll(".tab")],
+    search: document.getElementById("search"),
+    list: document.getElementById("list"),
+
+    activeListLabel: document.getElementById("activeListLabel"),
+    shownMeta: document.getElementById("shownMeta"),
+    parsingMeta: document.getElementById("parsingMeta"),
+
+    ratioBar: document.getElementById("ratioBar"),
+    ratioLeft: document.getElementById("ratioLeft"),
+    ratioRight: document.getElementById("ratioRight"),
+
+    splitBar: document.getElementById("splitBar"),
+    splitLeft: document.getElementById("splitLeft"),
+    splitRight: document.getElementById("splitRight"),
+
+    btnCopy: document.getElementById("btnCopy"),
+    btnDownloadCSV: document.getElementById("btnDownloadCSV"),
+    btnDownloadExport: document.getElementById("btnDownloadExport"),
+    btnDownloadReport: document.getElementById("btnDownloadReport"),
+  };
+
+  // ----------------------------
+  // State
+  // ----------------------------
+  const state = {
+    followersFile: null,
+    followingFile: null,
+    followersData: null,
+    followingData: null,
+
+    followersSet: new Set(),
+    followingSet: new Set(),
+
+    followersStats: null,
+    followingStats: null,
+
+    exportData: null,      // {followers_count, following_count, not_following_back, i_dont_follow_back}
+    project: "",
+    generatedISO: "",
+    activeTab: "nfb",      // nfb | idfb
+  };
+
+  // ----------------------------
+  // UI helpers
+  // ----------------------------
+  function setStatus(kind, text) {
+    el.statusDot.classList.remove("ok", "bad");
+    if (kind === "ok") el.statusDot.classList.add("ok");
+    if (kind === "bad") el.statusDot.classList.add("bad");
+    el.statusText.textContent = text;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+
+  function clamp01(x) {
+    if (!Number.isFinite(x)) return 0;
+    return Math.max(0, Math.min(1, x));
+  }
+
+  function sanitizeProjectName(name) {
+    const raw = String(name || "").trim() || "instagram_report";
+    // allow only [a-zA-Z0-9-_ ] then spaces -> _
+    const cleaned = raw.replace(/[^a-zA-Z0-9\-_ ]+/g, "").trim().replace(/\s+/g, "_").replace(/^_+|_+$/g, "");
+    return cleaned || "instagram_report";
+  }
+
+  // ----------------------------
+  // Parsing logic (spec-compliant)
+  // ----------------------------
+  function normalizeUsername(raw) {
+    if (typeof raw !== "string") return null;
+    let s = raw.trim();
+    if (!s) return null;
+
+    // Robustness: if it's an instagram URL, try extract last path segment (including /_u/<user>)
+    if (s.includes("instagram.com")) {
+      try {
+        const u = new URL(s);
+        let path = (u.pathname || "").replace(/^\/+|\/+$/g, "");
+        let parts = path.split("/").filter(Boolean);
+        if (parts[0] === "_u") parts = parts.slice(1);
+        if (parts.length) s = parts[parts.length - 1];
+      } catch(_) {
+        // keep original
+      }
+    }
+
+    s = s.trim();
+    if (s.startsWith("@")) s = s.slice(1);
+    s = s.trim().toLowerCase();
+    return s || null;
+  }
+
+  function getStringListValue(item) {
+    const sld = item?.string_list_data;
+    if (!Array.isArray(sld) || !sld.length) return null;
+    const first = sld[0];
+    if (!first || typeof first !== "object") return null;
+    const val = first.value;
+    return (typeof val === "string") ? val : null;
+  }
+
+  function getTitle(item) {
+    const t = item?.title;
+    if (typeof t !== "string") return null;
+    const s = t.trim();
+    return s ? s : null;
+  }
+
+  function newStats() {
+    return { total_items:0, extracted:0, skipped:0, used_primary:0, used_fallback:0 };
+  }
+
+  function extractFollowersSet(data) {
+    // Followers JSON: root LIST of objects
+    // Username priority:
+    //   1) item["string_list_data"][0]["value"]
+    //   2) fallback: item.get("title") if not empty
+    let items = null;
+
+    if (Array.isArray(data)) {
+      items = data;
+    } else if (data && typeof data === "object") {
+      // Soft fallback (non-hard-fail): try common keys if present
+      const keys = ["relationships_followers", "followers", "relationships_followers_recent"];
+      for (const k of keys) {
+        if (Array.isArray(data[k])) { items = data[k]; break; }
+      }
+      if (!items) {
+        throw new Error("Followers JSON: expected root LIST. Provided root is an object without a known list key.");
+      }
+    } else {
+      throw new Error(`Followers JSON: expected root LIST, got ${typeof data}.`);
+    }
+
+    const out = new Set();
+    const st = newStats();
+
+    for (const it of items) {
+      st.total_items++;
+      if (!it || typeof it !== "object") { st.skipped++; continue; }
+
+      let raw = getStringListValue(it);
+      if (raw != null) st.used_primary++;
+      else {
+        raw = getTitle(it);
+        if (raw != null) st.used_fallback++;
+      }
+
+      const u = normalizeUsername(raw);
+      if (u) { out.add(u); st.extracted++; }
+      else st.skipped++;
+    }
+
+    return { set: out, stats: st };
+  }
+
+  function extractFollowingSet(data) {
+    // Following JSON: root OBJECT with key "relationships_following" (LIST).
+    // Username priority:
+    //   1) item["title"]
+    //   2) fallback item["string_list_data"][0]["value"]
+    let items = null;
+
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      if (Array.isArray(data.relationships_following)) items = data.relationships_following;
+      else throw new Error('Following JSON: expected root object with key "relationships_following" as a LIST.');
+    } else if (Array.isArray(data)) {
+      // Soft fallback
+      items = data;
+    } else {
+      throw new Error(`Following JSON: expected root object, got ${typeof data}.`);
+    }
+
+    const out = new Set();
+    const st = newStats();
+
+    for (const it of items) {
+      st.total_items++;
+      if (!it || typeof it !== "object") { st.skipped++; continue; }
+
+      let raw = getTitle(it);
+      if (raw != null) st.used_primary++;
+      else {
+        raw = getStringListValue(it);
+        if (raw != null) st.used_fallback++;
+      }
+
+      const u = normalizeUsername(raw);
+      if (u) { out.add(u); st.extracted++; }
+      else st.skipped++;
+    }
+
+    return { set: out, stats: st };
+  }
+
+  // ----------------------------
+  // File reading
+  // ----------------------------
+  function readFileAsJSON(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onerror = () => reject(new Error("File read error"));
+      r.onload = () => {
+        try {
+          const data = JSON.parse(String(r.result || ""));
+          resolve(data);
+        } catch (e) {
+          reject(new Error("JSON invalido: " + (e?.message || String(e))));
+        }
+      };
+      r.readAsText(file, "utf-8");
+    });
+  }
+
+  function canCompute() {
+    return !!(state.followersFile && state.followingFile);
+  }
+
+  function updateComputeButton() {
+    el.btnCompute.disabled = !canCompute();
+  }
+
+  // ----------------------------
+  // Rendering
+  // ----------------------------
+  function setActiveTab(tab) {
+    state.activeTab = tab;
+    el.tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+    renderList();
+  }
+
+  function getActiveList() {
+    if (!state.exportData) return [];
+    return (state.activeTab === "nfb")
+      ? state.exportData.not_following_back
+      : state.exportData.i_dont_follow_back;
+  }
+
+  function renderTop() {
+    const d = state.exportData;
+    if (!d) return;
+
+    el.cards.classList.remove("hidden");
+    el.resultsPanel.classList.remove("hidden");
+
+    el.followersCount.textContent = d.followers_count.toLocaleString();
+    el.followingCount.textContent = d.following_count.toLocaleString();
+    el.nfbCount.textContent = d.not_following_back.length.toLocaleString();
+    el.idfbCount.textContent = d.i_dont_follow_back.length.toLocaleString();
+
+    const followers = d.followers_count;
+    const following = d.following_count;
+    const nfb = d.not_following_back.length;
+    const idfb = d.i_dont_follow_back.length;
+
+    const ratio = following > 0 ? (followers / following) : 0;
+    el.ratioBar.style.width = (clamp01(ratio) * 100).toFixed(1) + "%";
+    el.ratioLeft.textContent = `ratio=${ratio.toFixed(3)}`;
+    el.ratioRight.textContent = `${followers.toLocaleString()} / ${following.toLocaleString()}`;
+
+    const totalUnrec = nfb + idfb;
+    const nfbShare = totalUnrec > 0 ? nfb / totalUnrec : 0;
+    el.splitBar.style.width = (clamp01(nfbShare) * 100).toFixed(1) + "%";
+    el.splitLeft.textContent = `nfb_share=${nfbShare.toFixed(3)}`;
+    el.splitRight.textContent = `nfb=${nfb.toLocaleString()} | idfb=${idfb.toLocaleString()}`;
+
+    // Parsing diagnostics badge
+    const fs = state.followersStats, gs = state.followingStats;
+    el.parsingMeta.textContent =
+      `Followers: extracted=${fs.extracted}/${fs.total_items} (p=${fs.used_primary}, f=${fs.used_fallback}) | ` +
+      `Following: extracted=${gs.extracted}/${gs.total_items} (p=${gs.used_primary}, f=${gs.used_fallback})`;
+  }
+
+  function renderList() {
+    const d = state.exportData;
+    if (!d) return;
+
+    const q = (el.search.value || "").trim().toLowerCase();
+    const list = getActiveList();
+    const filtered = q ? list.filter(u => String(u).toLowerCase().includes(q)) : list;
+
+    el.activeListLabel.textContent = (state.activeTab === "nfb")
+      ? "NOT FOLLOWING BACK (following - followers)"
+      : "I DON'T FOLLOW BACK (followers - following)";
+
+    el.shownMeta.textContent = `Shown: ${filtered.length.toLocaleString()} / Total: ${list.length.toLocaleString()}`;
+
+    el.list.innerHTML = "";
+    if (filtered.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "row";
+      empty.innerHTML = `<div class="idx">—</div><div class="user">No results</div><div class="badge">empty</div>`;
+      el.list.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach((u, i) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<div class="idx">${String(i+1).padStart(3," ")}</div><div class="user">${escapeHtml(String(u))}</div><div class="badge">@</div>`;
+      el.list.appendChild(row);
+    });
+  }
+
+  // ----------------------------
+  // Compute (set math like Python)
+  // ----------------------------
+  function computeExport() {
+    const followers = state.followersSet;
+    const following = state.followingSet;
+
+    const not_following_back = [...following].filter(u => !followers.has(u)).sort();
+    const i_dont_follow_back = [...followers].filter(u => !following.has(u)).sort();
+
+    return {
+      followers_count: followers.size,
+      following_count: following.size,
+      not_following_back,
+      i_dont_follow_back
+    };
+  }
+
+  // ----------------------------
+  // Downloads: export.json / report.txt / CSV
+  // ----------------------------
+  function downloadBlob(filename, content, mime) {
+    const blob = new Blob([content], { type: mime });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1200);
+  }
+
+  function buildReportText() {
+    const proj = state.project || "instagram_report";
+    const iso = state.generatedISO || new Date().toISOString();
+    const d = state.exportData;
+
+    const lines = [];
+    lines.push(`Project: ${proj}`);
+    lines.push(`Generated: ${iso}`);
+    lines.push("");
+    lines.push("SUMMARY");
+    lines.push(`- Followers: ${d.followers_count}`);
+    lines.push(`- Following: ${d.following_count}`);
+    lines.push(`- Not following back: ${d.not_following_back.length}`);
+    lines.push(`- I don't follow back: ${d.i_dont_follow_back.length}`);
+    lines.push("");
+    lines.push("NOT FOLLOWING BACK (following - followers)");
+    if (d.not_following_back.length) {
+      d.not_following_back.forEach((u,i) => lines.push(`${i+1}. ${u}`));
+    } else {
+      lines.push("(none)");
+    }
+    lines.push("");
+    lines.push("I DON'T FOLLOW BACK (followers - following)");
+    if (d.i_dont_follow_back.length) {
+      d.i_dont_follow_back.forEach((u,i) => lines.push(`${i+1}. ${u}`));
+    } else {
+      lines.push("(none)");
+    }
+    lines.push("");
+    lines.push("PARSING DIAGNOSTICS");
+    lines.push(
+      `- Followers file: total_items=${state.followersStats.total_items}, extracted=${state.followersStats.extracted}, ` +
+      `skipped=${state.followersStats.skipped}, used_primary=${state.followersStats.used_primary}, used_fallback=${state.followersStats.used_fallback}`
+    );
+    lines.push(
+      `- Following file: total_items=${state.followingStats.total_items}, extracted=${state.followingStats.extracted}, ` +
+      `skipped=${state.followingStats.skipped}, used_primary=${state.followingStats.used_primary}, used_fallback=${state.followingStats.used_fallback}`
+    );
+    lines.push("");
+
+    return lines.join("\n");
+  }
+
+  function downloadCSV() {
+    const list = getActiveList();
+    const q = (el.search.value || "").trim().toLowerCase();
+    const filtered = q ? list.filter(u => String(u).toLowerCase().includes(q)) : list;
+
+    const header = "index,username\n";
+    const rows = filtered.map((u, i) => `${i+1},"${String(u).replace(/"/g,'""')}"`).join("\n");
+    const tabLabel = state.activeTab === "nfb" ? "not_following_back" : "i_dont_follow_back";
+
+    const base = sanitizeProjectName(state.project || "instagram_report");
+    downloadBlob(`${base}_${tabLabel}.csv`, header + rows + "\n", "text/csv;charset=utf-8");
+  }
+
+  async function copyActiveList() {
+    const list = getActiveList();
+    const q = (el.search.value || "").trim().toLowerCase();
+    const filtered = q ? list.filter(u => String(u).toLowerCase().includes(q)) : list;
+    const text = filtered.join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("ok", "Lista copiata negli appunti");
+      setTimeout(() => setStatus("ok", "Calcolo completato"), 1000);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setStatus("ok", "Lista copiata (fallback)");
+      setTimeout(() => setStatus("ok", "Calcolo completato"), 1000);
+    }
+  }
+
+  // ----------------------------
+  // Event handlers
+  // ----------------------------
+  el.fileFollowers.addEventListener("change", async (ev) => {
+    const f = ev.target.files && ev.target.files[0];
+    state.followersFile = f || null;
+    state.followersData = null;
+    updateComputeButton();
+
+    if (!f) { setStatus("warn", "Seleziona i file…"); return; }
+
+    try {
+      setStatus("warn", "Caricamento followers…");
+      state.followersData = await readFileAsJSON(f);
+      setStatus("warn", "Followers OK. Seleziona following…");
+    } catch (e) {
+      setStatus("bad", "Followers JSON invalido");
+      el.diagBox.textContent = "Errore followers: " + (e?.message || String(e));
+      state.followersFile = null;
+      updateComputeButton();
+    }
+  });
+
+  el.fileFollowing.addEventListener("change", async (ev) => {
+    const f = ev.target.files && ev.target.files[0];
+    state.followingFile = f || null;
+    state.followingData = null;
+    updateComputeButton();
+
+    if (!f) { setStatus("warn", "Seleziona i file…"); return; }
+
+    try {
+      setStatus("warn", "Caricamento following…");
+      state.followingData = await readFileAsJSON(f);
+      setStatus("warn", "Following OK. Pronto a calcolare.");
+    } catch (e) {
+      setStatus("bad", "Following JSON invalido");
+      el.diagBox.textContent = "Errore following: " + (e?.message || String(e));
+      state.followingFile = null;
+      updateComputeButton();
+    }
+  });
+
+  el.btnCompute.addEventListener("click", () => {
+    try {
+      setStatus("warn", "Parsing + set-diff…");
+      el.diagBox.textContent = "Parsing in corso…";
+
+      // Parse followers
+      const { set: fset, stats: fstats } = extractFollowersSet(state.followersData);
+      // Parse following
+      const { set: gset, stats: gstats } = extractFollowingSet(state.followingData);
+
+      state.followersSet = fset;
+      state.followingSet = gset;
+      state.followersStats = fstats;
+      state.followingStats = gstats;
+
+      state.exportData = computeExport();
+      state.project = (el.projectName.value || "").trim() || "instagram_report";
+      state.generatedISO = new Date().toISOString();
+
+      el.diagBox.textContent =
+        "OK. Dati calcolati. Puoi filtrare, copiare, scaricare CSV/export/report.";
+
+      setStatus("ok", "Calcolo completato");
+      renderTop();
+      renderList();
+    } catch (e) {
+      setStatus("bad", "Errore parsing formato");
+      el.diagBox.textContent =
+        "Formato non atteso o incoerente. Dettagli: " + (e?.message || String(e));
+    }
+  });
+
+  el.tabs.forEach(t => t.addEventListener("click", () => setActiveTab(t.dataset.tab)));
+  el.search.addEventListener("input", () => renderList());
+
+  el.btnCopy.addEventListener("click", () => copyActiveList());
+  el.btnDownloadCSV.addEventListener("click", () => downloadCSV());
+
+  el.btnDownloadExport.addEventListener("click", () => {
+    if (!state.exportData) return;
+    const base = sanitizeProjectName(state.project || "instagram_report");
+    downloadBlob(`${base}_export.json`, JSON.stringify(state.exportData, null, 2), "application/json;charset=utf-8");
+  });
+
+  el.btnDownloadReport.addEventListener("click", () => {
+    if (!state.exportData) return;
+    const base = sanitizeProjectName(state.project || "instagram_report");
+    downloadBlob(`${base}_report.txt`, buildReportText(), "text/plain;charset=utf-8");
+  });
+
+  // Init
+  setStatus("warn", "Seleziona i file…");
+  updateComputeButton();
+})();
+</script>
+</body>
+</html>

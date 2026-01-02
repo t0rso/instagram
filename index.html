@@ -210,8 +210,8 @@
   <div class="wrap">
     <header>
       <div class="title">
-        <h1>Instagram Followers vs Following — Static Dashboard</h1>
-        <p>
+        <h1>Instagram Followers</h1>
+        <p style="display: None;">
           Seleziona i due file JSON dell’export Instagram e visualizza il confronto.
           Tutto avviene <b>localmente</b> (no upload).<br/>
           Parsing supportato: Followers <code>LIST</code> (value→title) + Following <code>object.relationships_following</code> (title→value).
@@ -235,11 +235,11 @@
         </div>
         <div class="field">
           <label>Nome progetto (opzionale)</label>
-          <input id="projectName" type="text" placeholder="es. IG_Audit_Jan2026" />
+          <input id="projectName" type="text" placeholder="es. michele_torsani" />
         </div>
       </div>
 
-      <div class="notice" id="diagBox">
+      <div class="notice" id="diagBox" style="display: none;">
         Suggerimento: se Instagram ti ha esportato file con nomi simili, controlla il contenuto:
         Followers = lista; Following = oggetto con <code>relationships_following</code>.
       </div>

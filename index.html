@@ -15,7 +15,7 @@
   <header class="site-header"style="padding: 0px 10px">
     <div class="container header-inner">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">◎</div>
+        <div class="brand-mark" aria-hidden="true" style="display: none;">◎</div>
         <div class="brand-text">
           <div class="brand-title">Instagram Follow Analyzer</div>
           <div class="brand-subtitle" style="display: none;">Static • Offline • No backend • file:// ready</div>
@@ -45,20 +45,20 @@
         <h2 class="howto-title">Come scaricare i file corretti</h2>
 
         <ol class="howto-steps">
-            <li>Apri il link in alto e richiedi il download dei dati Instagram</li>
-            <li>Nella selezione scegli solo:
+            <li>Click the button up here and then create a new export</li>
+            <li>Select just this category
             <ul>
                 <li><strong>Followers</strong></li>
                 <li><strong>Following</strong></li>
             </ul>
             </li>
-            <li>Impostazioni richieste:
+            <li>Require settings
             <ul>
-                <li>Formato: <strong>JSON</strong> (non HTML)</li>
-                <li>Intervallo: <strong>Sempre</strong> (consigliato)</li>
+                <li>Format: <strong>JSON</strong> (not HTML)</li>
+                <li>Timeline: <strong>Always</strong> (suggested)</li>
             </ul>
             </li>
-            <li>Scarica lo ZIP, estrai i file e carica qui:
+            <li>Dowload the zip file, extract it and then upload it here:
             <ul>
                 <li><code>followers.json</code></li>
                 <li><code>following.json</code></li>
@@ -66,7 +66,7 @@
             </li>
         </ol>
 
-            <p class="howto-note">Tutti gli altri file non sono necessari per l’analisi.</p>
+            <p class="howto-note">The other file are useless fot the analysis</p>
             </div>
 
           <div class="hero-badges" aria-label="Key features" style="display: none;">
@@ -84,8 +84,8 @@
           <div class="form-grid" role="form" aria-label="Caricamento file e configurazione progetto">
             <div class="field">
               <label class="label" for="projectName">Project name</label>
-              <input id="projectName" class="input" type="text" placeholder="Es: jan-2026-audit" autocomplete="off" />
-              <div class="hint">Usato per titoli e filename export.</div>
+              <input id="projectName" class="input" type="text" placeholder="Es: michele_torsani" autocomplete="off" />
+              <div class="hint" style="display: none;">Usato per titoli e filename export.</div>
             </div>
 
             <div class="field">
@@ -95,8 +95,8 @@
                 <label class="file-label" for="followersFile" aria-label="Seleziona file followers JSON"></label>
 
                 <div class="dz-inner">
-                    <div class="dz-title">Trascina &amp; drop (o clicca)</div>
-                    <div class="dz-sub" id="followersMeta">Nessun file selezionato</div>
+                    <div class="dz-title">Drag &amp; Drop (or click)</div>
+                    <div class="dz-sub" id="followersMeta">No file selected</div>
                 </div>
                 </div>
             </div>
@@ -107,8 +107,8 @@
                 <input id="followingFile" class="file" type="file" accept="application/json,.json" />
                 <label class="file-label" for="followingFile" aria-label="Seleziona file following JSON"></label>
                 <div class="dz-inner">
-                  <div class="dz-title">Trascina &amp; drop (o clicca)</div>
-                  <div class="dz-sub" id="followingMeta">Nessun file selezionato</div>
+                  <div class="dz-title">Drag &amp; Drop (or click)</div>
+                  <div class="dz-sub" id="followingMeta">No file selected</div>
                 </div>
               </div>
             </div>
@@ -127,7 +127,7 @@
             <div id="statusBanner" class="status-banner status-empty">
               <div class="status-dot" aria-hidden="true"></div>
               <div class="status-text">
-                Carica entrambi i file per abilitare <strong>Analyze</strong>.
+                Upload both file to enable <strong>Analyze</strong>.
               </div>
             </div>
           </div>
@@ -142,25 +142,25 @@
         <article class="card">
           <div class="card-kicker">Followers</div>
           <div class="card-value" id="followersCount">—</div>
-          <div class="card-meta">Deduplicati (Set)</div>
+          <div class="card-meta" style="display: none;">Deduplicati (Set)</div>
         </article>
 
         <article class="card">
           <div class="card-kicker">Following</div>
           <div class="card-value" id="followingCount">—</div>
-          <div class="card-meta">Deduplicati (Set)</div>
+          <div class="card-meta "style="display: none;">Deduplicati (Set)</div>
         </article>
 
         <article class="card">
           <div class="card-kicker">Not following back</div>
           <div class="card-value" id="notFollowingBackCount">—</div>
-          <div class="card-meta"><span id="notFollowingBackPct">—</span> di following</div>
+          <div class="card-meta"style="display: none;"><span id="notFollowingBackPct">—</span> di following</div>
         </article>
 
         <article class="card">
           <div class="card-kicker">I don’t follow back</div>
           <div class="card-value" id="iDontFollowBackCount">—</div>
-          <div class="card-meta"><span id="iDontFollowBackPct">—</span> di followers</div>
+          <div class="card-meta"style="display: none;"><span id="iDontFollowBackPct">—</span> di followers</div>
         </article>
       </div>
 
@@ -217,7 +217,7 @@
           </div>
 
           <footer class="list-foot">
-            <div class="muted">Tip: click su un username per copiarlo.</div>
+            <div class="muted">Tip: Click on the userame to copy it</div>
           </footer>
         </section>
 
@@ -251,13 +251,13 @@
           </div>
 
           <footer class="list-foot">
-            <div class="muted">Tip: Enter su un item = copia.</div>
+            <div class="muted">Tip: Click on the userame to copy it</div>
           </footer>
         </section>
       </div>
     </section>
 
-    <section class="container section">
+    <section class="container section" style="display: none;">
       <details class="tech-details">
         <summary>Debug / parsing hints</summary>
         <div class="tech-box">
@@ -270,7 +270,7 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="muted">
-        Built with vanilla HTML/CSS/JS • Offline
+        Created by Michele Torsani
       </div>
       <div class="muted">
         A11y: focus states, aria, semantic layout

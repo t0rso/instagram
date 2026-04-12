@@ -1,0 +1,8 @@
+Replace the PNG files in this folder with your own app icon (square artwork).
+
+Keep the same filenames so you do not need to edit HTML or manifest:
+  - icon-192.png   → 192×192 pixels (PWA)
+  - icon-512.png   → 512×512 pixels (PWA)
+  - apple-touch-icon.png → 180×180 pixels (Safari Add to Home Screen)
+
+Use PNG format. After replacing, refresh the site; on iOS you may need to remove the old home screen shortcut and add it again to see the new icon.

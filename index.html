@@ -1,283 +1,153 @@
-<!doctype html>
-<html lang="it">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="color-scheme" content="dark light" />
-  <title>Instagram Follow Analyzer (Static)</title>
-  <link rel="stylesheet" href="./assets/styles.css" />
-  <script defer src="./assets/app.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Compare your Instagram followers and following export files locally to see who does not follow you back.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Followback">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <title>Followback Check</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-
-  <header class="site-header"style="padding: 0px 10px">
-    <div class="container header-inner">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true" style="display: none;">◎</div>
-        <div class="brand-text">
-          <div class="brand-title">Instagram Follow Analyzer</div>
-          <div class="brand-subtitle" style="display: none;">Static • Offline • No backend • file:// ready</div>
-        </div>
+  <div id="app" class="app">
+    <header class="header">
+      <div class="header__badge" aria-hidden="true">
+        <img src="icons/icon-512.png" alt="Followback Check" style="width: 100%; height: 100%; object-fit: contain;">
       </div>
-
-      <div class="header-actions">
-        <a id="igDownloadBtn"
-           class="btn btn-primary"
-           href="#"
-           target="_blank"
-           rel="noopener noreferrer"
-           aria-label="Apri il link per scaricare i JSON da Instagram (nuova scheda)">
-          Download Instagram JSON
-        </a>
-        
-      </div>
-    </div>
-  </header>
-
-  <main id="main" class="site-main">
-    <section class="hero">
-      <div class="container hero-inner">
-        <div class="hero-copy">
-        <h1 class="hero-title" style="display: none;">Followers vs Following</h1>
-        <div class="hero-desc hero-howto" aria-label="Istruzioni per scaricare i file corretti">
-        <h2 class="howto-title">Come scaricare i file corretti</h2>
-
-        <ol class="howto-steps">
-            <li>Click the button up here and then create a new export</li>
-            <li>Select just this category
-            <ul>
-                <li><strong>Followers</strong></li>
-                <li><strong>Following</strong></li>
-            </ul>
-            </li>
-            <li>Require settings
-            <ul>
-                <li>Format: <strong>JSON</strong> (not HTML)</li>
-                <li>Timeline: <strong>Always</strong> (suggested)</li>
-            </ul>
-            </li>
-            <li>Dowload the zip file, extract it and then upload it here:
-            <ul>
-                <li><code>followers.json</code></li>
-                <li><code>following.json</code></li>
-            </ul>
-            </li>
-        </ol>
-
-            <p class="howto-note">The other file are useless fot the analysis</p>
-            </div>
-
-          <div class="hero-badges" aria-label="Key features" style="display: none;">
-            <span class="badge">Set diff O(n)</span>
-            <span class="badge">Normalizzazione @ + lowercase</span>
-            <span class="badge">Error handling robusto</span>
-            <span class="badge">Virtual list</span>
-            <span class="badge">A11y</span>
-          </div>
+      <h1 class="logo">Followback Check</h1>
+      <p class="tagline">Who does not follow you back</p>
+    </header>
+    <main class="main">
+      <section id="screen-landing" class="screen screen--landing" aria-labelledby="landing-heading">
+        <h2 id="landing-heading" class="screen__title">Get started</h2>
+        <p class="screen__lead screen__lead--landing">Do you already have your Instagram data export files (JSON)?</p>
+        <div class="actions actions--landing">
+          <button type="button" class="btn btn--primary" id="btn-have-files" aria-describedby="landing-heading">
+            Yes, I have them
+          </button>
+          <a
+            class="btn btn--secondary"
+            href="https://accountscenter.instagram.com/info_and_permissions/dyi/?__coig_login=1"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="link-download"
+          >
+            No, I need to download them
+          </a>
         </div>
+      </section>
 
-        <div class="panel">
-          <h2 class="panel-title">Input</h2>
+      <!-- Screen 2: upload -->
+      <section id="screen-upload" class="screen screen--upload" hidden aria-labelledby="upload-heading">
+        <header class="upload-page-head">
+          <h2 id="upload-heading" class="upload-page-head__title">Add your files</h2>
+          <p class="upload-page-head__sub">Choose the two JSON files from your Instagram data export. Nothing is uploaded anywhere.</p>
+        </header>
 
-          <div class="form-grid" role="form" aria-label="Caricamento file e configurazione progetto">
-            <div class="field">
-              <label class="label" for="projectName">Project name</label>
-              <input id="projectName" class="input" type="text" placeholder="Es: michele_torsani" autocomplete="off" />
-              <div class="hint" style="display: none;">Usato per titoli e filename export.</div>
-            </div>
-
-            <div class="field">
-              <label class="label" for="followersFile">Followers JSON</label>
-                <div class="dropzone" id="followersDrop" tabindex="0" role="button" aria-label="Dropzone followers: trascina qui il file JSON o clicca per selezionarlo">
-                <input id="followersFile" class="file" type="file" accept="application/json,.json" />
-                <label class="file-label" for="followersFile" aria-label="Seleziona file followers JSON"></label>
-
-                <div class="dz-inner">
-                    <div class="dz-title">Drag &amp; Drop (or click)</div>
-                    <div class="dz-sub" id="followersMeta">No file selected</div>
-                </div>
-                </div>
-            </div>
-
-            <div class="field">
-              <label class="label" for="followingFile">Following JSON</label>
-              <div class="dropzone" id="followingDrop" tabindex="0" role="button" aria-label="Dropzone following: trascina qui il file JSON o clicca per selezionarlo">
-                <input id="followingFile" class="file" type="file" accept="application/json,.json" />
-                <label class="file-label" for="followingFile" aria-label="Seleziona file following JSON"></label>
-                <div class="dz-inner">
-                  <div class="dz-title">Drag &amp; Drop (or click)</div>
-                  <div class="dz-sub" id="followingMeta">No file selected</div>
-                </div>
+        <div class="upload-panel" role="group" aria-label="JSON files">
+          <div class="upload-item" data-upload="followers">
+            <div class="upload-item__label-row">
+              <span class="upload-item__step" aria-hidden="true">1</span>
+              <div class="upload-item__titles">
+                <h3 class="upload-item__name">Followers</h3>
+                <p class="upload-item__hint">Expected: <code>followers_1.json</code> (or another part of the export)</p>
               </div>
             </div>
-
-            <div class="field form-actions">
-              <button id="analyzeBtn" class="btn btn-cta" type="button" disabled>
-                Analyze
-              </button>
-              <button id="resetBtn" class="btn btn-ghost" type="button">
-                Reset
-              </button>
+            <div class="upload-item__slot">
+              <div class="upload-item__empty" id="followers-empty">
+                <label class="upload-tap" for="input-followers">
+                  <input type="file" id="input-followers" class="upload-tap__input" accept=".json,application/json" aria-describedby="upload-heading">
+                  <span class="upload-tap__face">Select JSON file</span>
+                </label>
+              </div>
+              <div class="upload-item__ready" id="followers-filled" hidden>
+                <p class="upload-item__filename" id="followers-file-name" aria-live="polite"></p>
+                <button type="button" class="upload-item__remove" id="btn-remove-followers">Remove</button>
+              </div>
             </div>
           </div>
 
-          <div class="status" aria-live="polite" aria-atomic="true">
-            <div id="statusBanner" class="status-banner status-empty">
-              <div class="status-dot" aria-hidden="true"></div>
-              <div class="status-text">
-                Upload both file to enable <strong>Analyze</strong>.
+          <div class="upload-panel__rule" role="presentation"></div>
+
+          <div class="upload-item" data-upload="following">
+            <div class="upload-item__label-row">
+              <span class="upload-item__step" aria-hidden="true">2</span>
+              <div class="upload-item__titles">
+                <h3 class="upload-item__name">Following</h3>
+                <p class="upload-item__hint">Expected: <code>following.json</code></p>
+              </div>
+            </div>
+            <div class="upload-item__slot">
+              <div class="upload-item__empty" id="following-empty">
+                <label class="upload-tap" for="input-following">
+                  <input type="file" id="input-following" class="upload-tap__input" accept=".json,application/json">
+                  <span class="upload-tap__face">Select JSON file</span>
+                </label>
+              </div>
+              <div class="upload-item__ready" id="following-filled" hidden>
+                <p class="upload-item__filename" id="following-file-name" aria-live="polite"></p>
+                <button type="button" class="upload-item__remove" id="btn-remove-following">Remove</button>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section class="container section" style="padding: 10px;">
-      <h2 class="section-title">Overview</h2>
+        <p class="alert alert--error upload-alert" id="upload-error" role="alert" hidden></p>
 
-      <div class="stats-grid" aria-label="Statistiche principali">
-        <article class="card">
-          <div class="card-kicker">Followers</div>
-          <div class="card-value" id="followersCount">—</div>
-          <div class="card-meta" style="display: none;">Deduplicati (Set)</div>
-        </article>
+        <div class="actions actions--row upload-actions">
+          <button type="button" class="btn btn--ghost" id="btn-upload-back">Back</button>
+          <button type="button" class="btn btn--primary" id="btn-analyze" disabled>Analyze</button>
+        </div>
+      </section>
 
-        <article class="card">
-          <div class="card-kicker">Following</div>
-          <div class="card-value" id="followingCount">—</div>
-          <div class="card-meta "style="display: none;">Deduplicati (Set)</div>
-        </article>
+      <!-- Screen 3: results -->
+      <section id="screen-results" class="screen" hidden aria-labelledby="results-heading">
+        <h2 id="results-heading" class="screen__title">Results</h2>
 
-        <article class="card">
-          <div class="card-kicker">Not following back</div>
-          <div class="card-value" id="notFollowingBackCount">—</div>
-          <div class="card-meta"style="display: none;"><span id="notFollowingBackPct">—</span> di following</div>
-        </article>
-
-        <article class="card">
-          <div class="card-kicker">I don’t follow back</div>
-          <div class="card-value" id="iDontFollowBackCount">—</div>
-          <div class="card-meta"style="display: none;"><span id="iDontFollowBackPct">—</span> di followers</div>
-        </article>
-      </div>
-
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <button id="downloadBtn" class="btn btn-primary" type="button" disabled>
-            Download report (JSON + MD)
-          </button>
-          <button id="downloadJsonBtn" class="btn btn-ghost" type="button" disabled aria-label="Scarica solo JSON">
-            JSON
-          </button>
-          <button id="downloadMdBtn" class="btn btn-ghost" type="button" disabled aria-label="Scarica solo Markdown">
-            MD
-          </button>
+        <div class="stats-row" id="results-stats" role="group" aria-label="Account totals from your export">
+          <div class="stat-tile">
+            <span class="stat-tile__value" id="stat-followers-count">—</span>
+            <span class="stat-tile__label">Followers</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-tile__value" id="stat-following-count">—</span>
+            <span class="stat-tile__label">Following</span>
+          </div>
+          <div class="stat-tile stat-tile--accent">
+            <span class="stat-tile__value" id="stat-not-back-count">—</span>
+            <span class="stat-tile__label">Not back</span>
+          </div>
         </div>
 
-        <div class="toolbar-right">
-          <div class="small-note" id="generatedMeta">—</div>
+        <p class="results-summary" id="results-summary" aria-live="polite"></p>
+        <p class="hint results-hint">Tap a username to copy it, then paste into Instagram search.</p>
+
+        <div class="results-shell">
+          <ul class="results-list" id="results-list" role="list"></ul>
         </div>
-      </div>
-    </section>
 
-    <section class="container section"style="padding: 10px;">
-      <h2 class="section-title">Lists</h2>
-
-      <div class="lists-grid">
-        <!-- LEFT: Not following back -->
-        <section class="list-card" aria-label="Not following back (following - followers)">
-          <header class="list-card-header">
-            <div class="list-card-title">
-              <h3>Not following back</h3>
-              <div class="list-card-sub">following \ followers</div>
-            </div>
-
-            <div class="list-card-actions">
-              <button id="nfSortBtn" class="btn btn-ghost btn-sm" type="button" disabled aria-label="Ordina Not following back">
-                Sort: A→Z
-              </button>
-              <button id="nfCopyBtn" class="btn btn-ghost btn-sm" type="button" disabled aria-label="Copia Not following back negli appunti">
-                Copy
-              </button>
-            </div>
-          </header>
-
-          <div class="list-controls">
-            <label class="sr-only" for="nfSearch">Search Not following back</label>
-            <input id="nfSearch" class="input input-sm" type="search" placeholder="Search username…" disabled />
-            <div class="pill" id="nfCountPill">0</div>
-          </div>
-
-          <div class="vlist" id="nfList" tabindex="0" role="list" aria-label="Lista Not following back (virtualizzata)">
-            <div class="vlist-spacer" aria-hidden="true"></div>
-            <div class="vlist-items"></div>
-          </div>
-
-          <footer class="list-foot">
-            <div class="muted">Tip: Click on the userame to copy it</div>
-          </footer>
-        </section>
-
-        <!-- RIGHT: I don't follow back -->
-        <section class="list-card" aria-label="I don't follow back (followers - following)">
-          <header class="list-card-header">
-            <div class="list-card-title">
-              <h3>I don’t follow back</h3>
-              <div class="list-card-sub">followers \ following</div>
-            </div>
-
-            <div class="list-card-actions">
-              <button id="idfbSortBtn" class="btn btn-ghost btn-sm" type="button" disabled aria-label="Ordina I don't follow back">
-                Sort: A→Z
-              </button>
-              <button id="idfbCopyBtn" class="btn btn-ghost btn-sm" type="button" disabled aria-label="Copia I don't follow back negli appunti">
-                Copy
-              </button>
-            </div>
-          </header>
-
-          <div class="list-controls">
-            <label class="sr-only" for="idfbSearch">Search I don't follow back</label>
-            <input id="idfbSearch" class="input input-sm" type="search" placeholder="Search username…" disabled />
-            <div class="pill" id="idfbCountPill">0</div>
-          </div>
-
-          <div class="vlist" id="idfbList" tabindex="0" role="list" aria-label="Lista I don't follow back (virtualizzata)">
-            <div class="vlist-spacer" aria-hidden="true"></div>
-            <div class="vlist-items"></div>
-          </div>
-
-          <footer class="list-foot">
-            <div class="muted">Tip: Click on the userame to copy it</div>
-          </footer>
-        </section>
-      </div>
-    </section>
-
-    <section class="container section" style="display: none;">
-      <details class="tech-details">
-        <summary>Debug / parsing hints</summary>
-        <div class="tech-box">
-          <pre id="debugBox" aria-label="Debug output">—</pre>
+        <div class="actions">
+          <button type="button" class="btn btn--secondary" id="btn-results-back">Change files</button>
         </div>
-      </details>
-    </section>
-  </main>
+      </section>
+    </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="muted">
-        Created by Michele Torsani
-      </div>
-      <div class="muted">
-        A11y: focus states, aria, semantic layout
-      </div>
-    </div>
-  </footer>
+    <footer class="footer">
+      <p>Created by Michele Torsani</p>
+    </footer>
+  </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+
+  <script src="app.js" defer></script>
 </body>
 </html>
